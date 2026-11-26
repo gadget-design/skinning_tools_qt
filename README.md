@@ -1,5 +1,5 @@
 日本語の案内は下部にあります。スクロールしてください。(Japanese information is available below. Please scroll down.)
-
+![image00](images/skinning_tools_qt_v105_img00.png)
 ==============================
 English
 ==============================
