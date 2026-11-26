@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>skinning_tools_qt Manual</title>
+<style>
+  :root {
+    --bg: #f7f7f5;
+    --surface: #ffffff;
+    --text: #1f2328;
+    --muted: #5d6470;
+    --border: #d9dce1;
+    --accent: #3d6fa8;
+    --accent-soft: #e6eef7;
+    --code-bg: #f0f1f3;
+    --note-bg: #fff7e0;
+    --note-border: #e3b341;
+    --badge: #c2410c;
+    --mock-bg: #444444;
+    --mock-panel: #2b2b2b;
+    --mock-head: #5d5d5d;
+    --mock-btn: #66666f;
+    --mock-text: #e6e6e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17191c;
+      --surface: #1f2226;
+      --text: #e4e6ea;
+      --muted: #9aa1ab;
+      --border: #343840;
+      --accent: #7fb0e8;
+      --accent-soft: #24303d;
+      --code-bg: #272b31;
+      --note-bg: #2e2915;
+      --note-border: #a8862d;
+      --badge: #fb923c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17191c;
+    --surface: #1f2226;
+    --text: #e4e6ea;
+    --muted: #9aa1ab;
+    --border: #343840;
+    --accent: #7fb0e8;
+    --accent-soft: #24303d;
+    --code-bg: #272b31;
+    --note-bg: #2e2915;
+    --note-border: #a8862d;
+    --badge: #fb923c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
+    line-height: 1.75;
+    font-size: 15px;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 32px 16px 80px; }
+  header h1 { font-size: 28px; margin: 0 0 4px; }
+  header .ver { color: var(--muted); margin: 0; }
+  nav.toc {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 14px 20px; margin: 24px 0 8px;
+  }
+  nav.toc ol { margin: 4px 0; padding-left: 22px; }
+  nav.toc a { color: var(--accent); text-decoration: none; }
+  nav.toc a:hover { text-decoration: underline; }
+  h2 {
+    font-size: 21px; margin: 44px 0 12px; padding-bottom: 6px;
+    border-bottom: 2px solid var(--border);
+  }
+  h3 { font-size: 17px; margin: 28px 0 8px; }
+  p, li { max-width: 100%; }
+  code, kbd {
+    font-family: Consolas, "Courier New", monospace; font-size: 13px;
+    background: var(--code-bg); border-radius: 4px; padding: 1px 5px;
+  }
+  kbd { border: 1px solid var(--border); }
+  pre {
+    background: var(--code-bg); border-radius: 6px; padding: 12px 14px;
+    overflow-x: auto; font-size: 13px; line-height: 1.55;
+  }
+  pre code { background: none; padding: 0; }
+  .ui { font-weight: 600; }
+  .en { color: var(--muted); font-size: 13px; }
+  table {
+    border-collapse: collapse; width: 100%; margin: 10px 0 14px;
+    background: var(--surface); font-size: 14px;
+  }
+  th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--accent-soft); font-weight: 600; }
+  .table-scroll { overflow-x: auto; }
+  .note {
+    background: var(--note-bg); border-left: 4px solid var(--note-border);
+    padding: 10px 14px; border-radius: 4px; margin: 14px 0;
+  }
+  .note p { margin: 4px 0; }
+  tr.pickup td { background: var(--accent-soft); }
+  .tag {
+    display: inline-block; background: var(--badge); color: #fff; font-size: 11px; font-weight: 700;
+    border-radius: 3px; padding: 0 6px; margin-top: 2px;
+  }
+  .note ul { margin: 4px 0; padding-left: 20px; }
+  .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 22px; height: 22px; border-radius: 11px; padding: 0 6px;
+    background: var(--badge); color: #fff; font-size: 12px; font-weight: 700;
+    margin-right: 6px; vertical-align: 1px;
+  }
+
+  /* Window layout diagram */
+  .layout { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; margin: 12px 0; }
+  .mock {
+    width: 320px; max-width: 100%; flex: none;
+    background: var(--mock-bg); color: var(--mock-text); border-radius: 6px;
+    padding: 4px; font-size: 11px; line-height: 1.3; border: 1px solid #222;
+  }
+  .mock .row { display: flex; gap: 3px; margin: 3px 0; align-items: center; position: relative; }
+  .mock .menu { gap: 10px; padding: 2px 4px; }
+  .mock .head { background: var(--mock-head); padding: 3px 6px; font-weight: 700; margin-top: 4px; }
+  .mock .btn { background: var(--mock-btn); border-radius: 2px; padding: 3px 4px; text-align: center; flex: 1; }
+  .mock .small { flex: none; padding: 3px 6px; }
+  .mock .field { background: #222; flex: 1; height: 16px; border-radius: 2px; }
+  .mock .list { background: var(--mock-panel); height: 70px; flex: 1; }
+  .mock .lower { background: #333; padding: 3px; }
+  .mock .r { background: #8a3b3b; } .mock .b { background: #3b3bb0; }
+  .mock .pr { background: #8c7575; } .mock .pb { background: #75758c; }
+  .mock .split { height: 8px; background: #5e5e72; margin: 5px 0; position: relative; }
+  .mock .status { color: #e6d933; padding: 2px 4px; }
+  .mock .tbl { background: var(--mock-panel); height: 80px; flex: 1; position: relative; }
+  .mock .tbl .colhead { position: absolute; left: 22px; top: 0; width: 44px; height: 28px; background: #8c5a2e; }
+  .mock .pin {
+    position: absolute; right: -14px; top: 50%; transform: translateY(-50%);
+    background: var(--badge); color: #fff; border-radius: 9px; min-width: 18px; height: 18px;
+    font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    padding: 0 4px; z-index: 1;
+  }
+  .mock .body { padding-right: 16px; }
+  .legend { flex: 1; min-width: 260px; margin: 0; padding-left: 0; list-style: none; }
+  .legend li { margin: 3px 0; }
+
+  footer { margin-top: 56px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); padding-top: 12px; }
+  footer a { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    body { font-size: 14px; }
+    header h1 { font-size: 23px; }
+    .mock { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>skinning_tools_qt Manual</h1>
+  <p class="ver">ver 1.0.5 / Maya 2022 or later (supports both PySide2 and PySide6)</p>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <strong>Contents</strong>
+  <ol>
+    <li><a href="#files">Files</a></li>
+    <li><a href="#launch">Launching the tool</a></li>
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#usage">Three ways to adjust weights</a> (<a href="#usage2">Adjusting selected vertices with buttons</a>)</li>
+    <li><a href="#layout">Window layout</a></li>
+    <li><a href="#menu">Menus</a></li>
+    <li><a href="#paint">Paint Skin Weights</a></li>
+    <li><a href="#vertex">Set Vertex Weights</a></li>
+    <li><a href="#copy">Copy / Paste</a></li>
+    <li><a href="#workflow">Workflow examples</a></li>
+    <li><a href="#notes">Notes</a></li>
+  </ol>
+</nav>
+
+<!-- ================================================================ -->
+<h2 id="files">1. Files</h2>
+<p>skinning_tools_qt consists of the following files.</p>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">File</th><th>Contents</th></tr>
+  <tr><td><code>skinning_tools_qt.py</code></td><td>The tool itself (Python script)</td></tr>
+  <tr><td><code>skinning_tools_qt_manual_Jpn.html</code></td><td>The manual (Japanese)</td></tr>
+  <tr><td><code>skinning_tools_qt_manual_Eng.html</code></td><td>This manual (English)</td></tr>
+</table></div>
+<p>
+  Place both manuals <strong>in the same folder as <code>skinning_tools_qt.py</code></strong>.
+  <span class="ui">Manual (Japanese)</span> / <span class="ui">Manual (English)</span> in the tool's <a href="#menu">Help menu</a> open these files located next to the .py file.
+  If it is placed anywhere else, the manual cannot be opened.
+</p>
+
+<!-- ================================================================ -->
+<h2 id="launch">2. Launching the tool</h2>
+<p>Run the following in the <strong>Python</strong> tab of Maya's Script Editor. Replace <code>path</code> with the location of <code>skinning_tools_qt.py</code>.</p>
+<pre><code>path = r"C:/tools/skinning_tools_qt.py"
+with open(path, encoding="utf-8") as f:
+    exec(compile(f.read(), path, "exec"))</code></pre>
+<p>If you put the file in a scripts folder and <code>import</code> it, call <code>main()</code> as follows.</p>
+<pre><code>import skinning_tools_qt
+skinning_tools_qt.main()</code></pre>
+<p>
+  If the window is already open, it is closed and reopened.
+  Registering this as a shelf button is convenient.
+</p>
+
+<!-- ================================================================ -->
+<h2 id="overview">3. Overview</h2>
+<p>
+  skinning_tools_qt is a tool for doing skin weight work in Maya from a single window.
+  It lets you do the following.
+</p>
+<ul>
+  <li><span class="ui">Paint Skin Weights</span>: operate Maya's standard Paint Skin Weights tool with an influence list and presets</li>
+  <li><span class="ui">Set Vertex Weights (1)</span>: add to or subtract from the weights of the selected vertices (edges, faces) in small steps with buttons</li>
+  <li><span class="ui">Set Vertex Weights (2)</span>: view the weights of the selected vertices (edges, faces) in a table (the weight table) and edit them directly as numbers</li>
+  <li><span class="ui">Copy / Paste</span>: copy and paste vertex weights or table cell values in the order they were selected</li>
+  <li>Locking (holding) influences, adding / removing influences, removing unused influences, and more</li>
+</ul>
+<p>There are three ways to adjust weights. Read the next chapter, "<a href="#usage">Three ways to adjust weights</a>", first.</p>
+<p>
+  The UI can be switched between Japanese and English (<a href="#menu-language">Language menu</a>). This manual uses the names shown in the English UI.
+</p>
+
+<!-- ================================================================ -->
+<h2 id="usage">4. Three ways to adjust weights</h2>
+<p>This tool offers the following three ways to adjust weights. Use whichever fits the task, or combine them.</p>
+<div class="table-scroll"><table>
+  <tr><th style="width:30%">Method</th><th>Operation</th><th style="width:28%">Best for</th></tr>
+  <tr><td><strong>[Method 1] Paint with a brush</strong></td>
+      <td>Press <span class="ui">Start Paint Mode</span> and paint weights with the brush</td>
+      <td>Roughly shaping or smoothing large areas</td></tr>
+  <tr class="pickup"><td><strong>[Method 2] Select vertices and adjust with the add / subtract buttons</strong><br></td>
+      <td>Select vertices and press buttons such as <code>+0.01</code> / <code>-0.01</code> (do not select cells in the table)</td>
+      <td>Fine-tuning while watching the vertex flow in a posed state</td></tr>
+  <tr><td><strong>[Method 3] Adjust with cells in the weight table</strong></td>
+      <td>Select vertices, select cells in the weight table, then press the add / subtract buttons or type a value</td>
+      <td>Entering exact values, or fixing only specific vertices / influences</td></tr>
+</table></div>
+<ul>
+  <li>For details, see "<a href="#paint">Paint Skin Weights</a>" for Method 1 and "<a href="#vertex-table">Weight table</a>" for Method 3.</li>
+  <li>Methods 2 and 3 use the same buttons (<a href="#vertex-preset">Add / Sub presets</a>). Which one applies depends on whether cells in the weight table are selected; you can tell from the <a href="#vertex-status">status</a> display.</li>
+</ul>
+
+<h3 id="usage2">About [Method 2] "Adjusting selected vertices with buttons"</h3>
+<p>
+  This method adds to or subtracts from the weights of the <strong>selected vertices</strong> with buttons, without selecting cells in the weight table.
+  You can temporarily move / rotate influences (joints) to deform the mesh, and then adjust the weights of the selected vertices little by little
+  while watching the vertex flow (edge loops) in wireframe.
+  Each button press immediately updates the mesh deformation, so you can check the result visually as you work.
+</p>
+
+<p><strong>Steps</strong></p>
+<ol>
+  <li>Select a skinned mesh. Its skin cluster is loaded into the tool.</li>
+  <li><strong>Temporarily move / rotate</strong> the influences (joints, etc.) around the area you want to adjust, so that the deformation is visible.</li>
+  <li>Press <span class="ui">Start Component Mode</span> and select the vertices to adjust. The <a href="#vertex-status">status</a> becomes <span class="ui">Status: Vertex mode</span>.</li>
+  <li>In the influence list (or by clicking a name in the column headers of the weight table), select the influence whose weight you want to increase / decrease.</li>
+  <li>Press an <span class="ui">Add</span> (<code>+0.001</code> to <code>+0.10</code>) / <span class="ui">Sub</span> (<code>-0.001</code> to <code>-0.10</code>) button in <span class="ui">Set Vertex Weights</span>. The value is added to / subtracted from all selected vertices.</li>
+  <li>Repeat steps 4 to 6 while watching the vertex flow (edge loops) of the deformation. You can reselect vertices and influences as many times as you like.</li>
+  <li>When finished, return the moved / rotated influences to their original position and rotation.</li>
+</ol>
+
+<div class="note">
+  <p><strong>Tips</strong></p>
+  <ul>
+    <li><strong>Do not select cells:</strong> if cells in the weight table are selected, the add / subtract buttons act on the cells (Method 3). To deselect cells, click an empty area of the table or click a name in the column headers.</li>
+    <li><strong>Choosing buttons:</strong> use <code>±0.10</code> / <code>±0.05</code> for rough changes and <code>±0.01</code> / <code>±0.001</code> for fine adjustment.</li>
+    <li><strong>Effect on other influences:</strong> when weight normalization is ON, the weights of other influences decrease by the amount you add (and increase when you subtract). <a href="#paint-list">Lock</a> any influences you do not want to change beforehand, and their values stay the same.</li>
+    <li><strong>Multiple influences:</strong> if several influences are selected, the same value is added to / subtracted from each of them.</li>
+    <li><strong>Value range:</strong> results are clamped to 0 to 1.</li>
+    <li>If a selected influence is locked, a message is shown and the operation stops. Unlock it and press the button again.</li>
+    <li>The weight table shows the values of the selected vertices, so you can also check how the values change when you press a button.</li>
+  </ul>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="layout">5. Window layout</h2>
+<p>The window is divided into an upper and a lower block. The numbers correspond to the descriptions below.</p>
+
+<div class="layout">
+  <div class="mock" role="img" aria-label="Diagram of the skinning_tools_qt window">
+    <div class="row menu body">Edit　List　Tools　Language　Help<span class="pin">1</span></div>
+    <div class="head">▼ Paint Skin Weights</div>
+    <div class="row body"><div class="btn">Start Paint Mode</div><div class="btn">End Paint Mode</div><span class="pin">2</span></div>
+    <div class="row body"><div class="btn small">🔒Lock All</div><div class="btn small">Unlock All</div><div class="field"></div><span class="pin">3</span></div>
+    <div class="row body"><div class="list"></div><span class="pin">4</span></div>
+    <div class="lower body">
+      <div class="row"><div class="btn small">G</div><div class="btn small">P</div><div class="btn small">S</div><span style="flex:1">○Replace ○Add…</span><div class="btn small">Color or Mono</div><span class="pin">5</span></div>
+      <div class="row"><span style="flex:1">Opac ▭━━━━<br>Val　 ▭━━━━</span><div class="btn small">Flood</div><span class="pin">6</span></div>
+      <div class="row"><span>add</span><div class="btn small r">+0.01</div><div class="btn small r">+0.10</div><span>scale</span><div class="btn small b">x0.90</div><span class="pin">7</span></div>
+    </div>
+    <div class="split body"><span class="pin">8</span></div>
+    <div class="head">▼ Set Vertex Weights:</div>
+    <div class="row body"><div class="btn">Start Component Mode</div><div class="btn">End</div><span class="pin">9</span></div>
+    <div class="row body"><span>Add:</span><div class="btn small pr">+0.01</div><span>Sub:</span><div class="btn small pb">-0.01</div><span class="pin">10</span></div>
+    <div class="row body status">Status: Vertex mode<span class="pin">11</span></div>
+    <div class="row body"><div class="tbl"><div class="colhead"></div></div><span class="pin">12</span></div>
+    <div class="row body"><div class="btn">Copy</div><div class="btn">Paste</div><span class="pin">13</span></div>
+    <div class="row body"><div class="btn">Close</div><span class="pin">14</span></div>
+  </div>
+
+  <ol class="legend">
+    <li><span class="badge">1</span><a href="#menu">Menu bar</a></li>
+    <li><span class="badge">2</span><a href="#paint-mode">Start / End Paint Mode</a></li>
+    <li><span class="badge">3</span><a href="#paint-lock">Lock All / Unlock All, Skin Cluster field</a></li>
+    <li><span class="badge">4</span><a href="#paint-list">Influence list</a></li>
+    <li><span class="badge">5</span><a href="#paint-brush">Brush shape, paint operation, Color or Mono</a></li>
+    <li><span class="badge">6</span><a href="#paint-value">Opac, Val, Flood</a></li>
+    <li><span class="badge">7</span><a href="#paint-preset">Presets (add / scale)</a></li>
+    <li><span class="badge">8</span><a href="#layout-split">Splitter bar</a></li>
+    <li><span class="badge">9</span><a href="#vertex-mode">Start / End Component Mode</a></li>
+    <li><span class="badge">10</span><a href="#vertex-preset">Add / Sub presets</a></li>
+    <li><span class="badge">11</span><a href="#vertex-status">Status</a></li>
+    <li><span class="badge">12</span><a href="#vertex-table">Weight table</a></li>
+    <li><span class="badge">13</span><a href="#copy">Copy / Paste</a></li>
+    <li><span class="badge">14</span>Close: closes the window</li>
+  </ol>
+</div>
+
+<h3 id="layout-split">Collapsing blocks and the splitter bar</h3>
+<ul>
+  <li>Click a block header (such as <span class="ui">▼ Paint Skin Weights</span>) to collapse / expand that block. Collapsing a block shrinks the window height accordingly.</li>
+  <li>Drag the splitter bar <span class="badge">8</span> between the two blocks up or down to change the height ratio of the blocks.</li>
+</ul>
+
+<!-- ================================================================ -->
+<h2 id="menu">6. Menus</h2>
+
+<h3>Edit</h3>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">Item</th><th>Function</th></tr>
+  <tr><td>Auto Load Object</td>
+      <td>When ON (default), the skin cluster of the object selected in the scene is automatically loaded into the tool. When OFF, the loaded skin cluster stays fixed.</td></tr>
+  <tr><td>Load Selected Object</td>
+      <td>Loads the skin cluster of the selected object. Use this when Auto Load Object is OFF.</td></tr>
+</table></div>
+
+<h3>List</h3>
+<p>Selects the sort order of the influence list.</p>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">Item</th><th>Order</th></tr>
+  <tr><td>Alphabetical / Reverse Alphabetical</td><td>Alphabetical order of influence names (default) / the reverse</td></tr>
+  <tr><td>Graph Order / Reverse Graph Order</td><td>The order in which influences are registered in the skin cluster / the reverse</td></tr>
+  <tr><td>Hold</td><td>Unlocked influences first, locked influences last</td></tr>
+  <tr><td>Reverse Hold</td><td>Locked influences first</td></tr>
+</table></div>
+
+<h3>Tools</h3>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">Item</th><th>Function</th></tr>
+  <tr><td>Select Affected Points</td>
+      <td>Selects all vertices on which the influences selected in the list have a weight greater than 0. This can take time on meshes with many vertices (while the progress bar at the bottom of the Maya window is shown, press <kbd>Esc</kbd> to cancel).</td></tr>
+  <tr><td>Remove Unused Influences</td>
+      <td>Runs Maya's standard "Remove Unused Influences" and refreshes the list. Select the skinned object first.</td></tr>
+  <tr><td>Add/Remove Influences ▶ Add Influences</td>
+      <td>Adds the joints, etc. selected in the scene to the loaded skin cluster as influences (with a weight of 0). Objects that are already influences are skipped.</td></tr>
+  <tr><td>Add/Remove Influences ▶ Remove Influences</td>
+      <td>Removes the influences selected in the list from the skin cluster. A confirmation dialog is shown.</td></tr>
+</table></div>
+
+<h3 id="menu-language">Language</h3>
+<p>
+  Choose <span class="ui">日本語</span> (Japanese) / <span class="ui">English</span> to switch the UI language.
+  The window is rebuilt automatically, but its position, size, list order, influence selection, and so on are kept.
+  The chosen language is saved and used the next time the tool starts (the default is Japanese).
+</p>
+
+<h3>Help</h3>
+<ul>
+  <li><span class="ui">Manual (Japanese)</span> / <span class="ui">Manual (English)</span>: shows the Japanese / English manual (<code>skinning_tools_qt_manual_Jpn.html</code> / <code>skinning_tools_qt_manual_Eng.html</code> in the same folder as <code>skinning_tools_qt.py</code>) in a dialog.</li>
+  <li><span class="ui">About skinning_tools_qt</span>: shows the tool name, version, and author.
+    Click the author name to open the author's website in a web browser.</li>
+</ul>
+
+<!-- ================================================================ -->
+<h2 id="paint">7. Paint Skin Weights</h2>
+
+<h3 id="paint-mode"><span class="badge">2</span>Start / End Paint Mode</h3>
+<ul>
+  <li><span class="ui">Start Paint Mode</span>: selects the geometry of the loaded skin cluster, switches to smooth shading, and enters Maya's Paint Skin Weights tool. If nothing is selected in the list, the influence currently being painted in the paint tool is selected in the list.</li>
+  <li><span class="ui">End Paint Mode</span>: returns to the Select tool.</li>
+</ul>
+
+<h3 id="paint-lock"><span class="badge">3</span>Lock All / Unlock All, Skin Cluster field</h3>
+<ul>
+  <li><span class="ui">Lock All</span> / <span class="ui">Unlock All</span>: locks / unlocks the weights of all influences in the list.</li>
+  <li><span class="ui">Skin Cluster</span> field: the name of the loaded skin cluster. Type a name and press <kbd>Enter</kbd> to load that skin cluster.
+      Right-click to use <span class="ui">Select Skin Cluster Node</span> / <span class="ui">Select Geometry</span>.</li>
+</ul>
+
+<h3 id="paint-list"><span class="badge">4</span>Influence list</h3>
+<p>The list of influences of the skin cluster. The influences selected in the list are the paint targets.</p>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">Action</th><th>Function</th></tr>
+  <tr><td>Click a name</td><td>Selects the influence and makes it the paint target. <kbd>Ctrl</kbd> + click adds / removes, <kbd>Shift</kbd> + click selects a range.</td></tr>
+  <tr><td>Click the only selected name again</td><td>Deselects it.</td></tr>
+  <tr><td>Click the lock button at the left end</td><td>Locks / unlocks the weights of that influence. Pressing the button of a selected influence sets all selected influences to the same state.</td></tr>
+  <tr><td>Drag up / down while holding a lock button</td><td>Gives the rows you drag over the same lock state as the row you pressed.</td></tr>
+  <tr><td>Double-click a name</td><td>Toggles lock / unlock. Double-clicking one of several selected influences toggles all selected influences together.</td></tr>
+  <tr><td>Right-click</td><td>Shows a menu (see the table below).</td></tr>
+</table></div>
+<p>Locked influences are shown with a darker name followed by <code>(Lock)</code>.</p>
+
+<p><strong>Right-click menu</strong></p>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">Item</th><th>Function</th></tr>
+  <tr><td>Hold/Unhold</td><td>Inverts the lock state of each selected influence.</td></tr>
+  <tr><td>Hold All / Unhold All</td><td>Locks / unlocks all influences.</td></tr>
+  <tr><td>Select Influence(s)</td><td>Selects the influences selected in the list in the scene.</td></tr>
+  <tr><td>Select affected points</td><td>Same as "Select Affected Points" in the Tools menu.</td></tr>
+  <tr><td>Reveal selected influence</td><td>Selects the joints selected in the scene in the list.</td></tr>
+</table></div>
+
+<h3 id="paint-brush"><span class="badge">5</span>Brush shape, paint operation, Color or Mono</h3>
+<ul>
+  <li><span class="ui">Brush shape</span>: from the left, Gaussian / Poly / Solid.</li>
+  <li><span class="ui">Paint operation</span>: Replace / Add / Scale / Smooth. The chosen operation is kept the next time the tool starts.</li>
+  <li><span class="ui">Color or Mono</span>: switches the weight display while painting between color and monochrome.</li>
+</ul>
+
+<h3 id="paint-value"><span class="badge">6</span>Opac, Val, Flood</h3>
+<ul>
+  <li><span class="ui">Opac</span> / <span class="ui">Val</span>: the opacity and value of the paint tool. Type in the number field or use the slider. The settings are kept the next time the tool starts.</li>
+  <li><span class="ui">Flood</span>: floods the whole geometry for the selected influence with the current operation, opacity, and value. Available only in paint mode.</li>
+</ul>
+
+<h3 id="paint-preset"><span class="badge">7</span>Presets (add / scale)</h3>
+<p>Pressing a button sets the paint operation and value at once.</p>
+<ul>
+  <li><span class="ui">add</span> (red buttons <code>+0.01</code> / <code>+0.02</code> / <code>+0.10</code> / <code>+0.20</code>): sets the operation to "Add" and the value to that number.</li>
+  <li><span class="ui">scale</span> (blue buttons <code>x0.80</code> / <code>x0.90</code> / <code>x0.98</code> / <code>x0.99</code>): sets the operation to "Scale" and the value to that number.</li>
+</ul>
+<p>When the window is narrow, the buttons wrap to the next line.</p>
+
+<!-- ================================================================ -->
+<h2 id="vertex">8. Set Vertex Weights</h2>
+
+<h3 id="vertex-mode"><span class="badge">9</span>Start / End Component Mode</h3>
+<ul>
+  <li><span class="ui">Start Component Mode</span>: selects the geometry of the loaded skin cluster and switches to component (vertex) selection mode.
+      Not only vertices: <strong>if you select edges or faces</strong>, the vertices on them are shown in the weight table and you can edit their weights (see <a href="#vertex-edge-face">When edges / faces are selected</a>).</li>
+  <li><span class="ui">End Component Mode</span>: returns to object selection mode.</li>
+</ul>
+
+<h3 id="vertex-preset"><span class="badge">10</span>Add / Sub presets</h3>
+<p>The <code>+0.001</code> / <code>+0.01</code> / <code>+0.05</code> / <code>+0.10</code> buttons and their negative counterparts add to / subtract from weights. The targets are as follows.</p>
+<ul>
+  <li><strong>When no cells are selected (Status: Vertex mode)</strong>: the influences selected in the influence list, on all vertices selected in the scene.
+      → <a href="#usage2">Method 2: Adjusting selected vertices with buttons</a></li>
+  <li><strong>When cells in the weight table are selected (Status: Cell mode)</strong>: the selected cells.
+      → Method 3 (<a href="#vertex-table">Weight table</a>)</li>
+</ul>
+<p>Results are clamped to the range 0 to 1. The values of locked influences are not changed (if vertices are selected and you press a button with a locked influence selected, a message is shown and the operation stops).</p>
+
+<h3 id="vertex-status"><span class="badge">11</span>Status</h3>
+<p>Shows the current selection state above the weight table. Use this display to tell what <a href="#copy">Copy / Paste</a> and the <a href="#vertex-preset">presets</a> will act on.</p>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">Display</th><th>State</th></tr>
+  <tr><td>Status: (white)</td><td>Neither vertices nor cells are selected</td></tr>
+  <tr><td>Status: Vertex mode (yellow)</td><td>Vertices (edges, faces) are selected in the scene</td></tr>
+  <tr><td>Status: Cell mode (blue)</td><td>Cells in the weight table are selected</td></tr>
+</table></div>
+<p>The color of the <a href="#vertex-table">column headers (influence names)</a> of the weight table changes together with the status: <strong>blue</strong> while cells are selected, and <strong>orange</strong> otherwise (for example, while vertices are selected).</p>
+
+<h3 id="vertex-table"><span class="badge">12</span>Weight table</h3>
+<p>A table listing the weights of the selected vertices. Rows are vertices and columns are influences.</p>
+<ul>
+  <li><strong>Vertices shown</strong>: the vertices selected in the scene, <strong>in the order they were selected</strong>. If an object is selected without selecting vertices, all vertices of that object are shown. Up to 1000 vertices are shown.</li>
+  <li id="vertex-edge-face"><strong>When edges / faces are selected</strong>: the vertices on the selected edges / faces are shown, in the order the edges / faces were selected, with each one's vertices in vertex-number order (vertices shared by neighboring edges / faces appear only once).
+      Just as when vertices are selected, you can edit the weights with the <a href="#vertex-preset">Add / Sub presets</a> and <a href="#copy">Copy / Paste</a> (they act on the vertices of the edges / faces; if you select cells in the table, you can also type values and work on cells).</li>
+  <li><strong>Columns shown</strong>: only influences that have a weight greater than 0 on at least one of the displayed vertices.</li>
+  <li><strong>Selecting an influence that is not in the table</strong>: if you select an influence in the influence list that is not shown in the table, <strong>only its column header (name)</strong> is shown at the right end of the table. The header is shown in gray, and the cells below it are blank and cannot be selected or edited.
+      The header is shown in the selected color, and its lock switch and click-to-select work as usual. It disappears when you deselect it in the list.
+      Once its weight becomes greater than 0 (for example with the <a href="#vertex-preset">Add presets</a>), it becomes a regular column with values.</li>
+  <li>Row headers show vertex numbers.</li>
+  <li><strong>Column header color</strong>: blue while cells are selected, orange otherwise (for example, while vertices are selected). It switches together with the <a href="#vertex-status">status</a>. Headers of selected influences are shown in a lighter shade of each color.</li>
+</ul>
+
+<p><strong>Column header (influence name) actions</strong></p>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">Action</th><th>Function</th></tr>
+  <tr><td>Click the name area</td><td>Selects that influence (linked with the selection in the influence list; the paint target also changes). <kbd>Ctrl</kbd> / <kbd>Shift</kbd> can also be used. If cells were selected, the cell selection is cleared.</td></tr>
+  <tr><td>Double-click the name area</td><td>Toggles lock / unlock.</td></tr>
+  <tr><td>Click the lock icon at the bottom</td><td>Toggles lock / unlock.</td></tr>
+</table></div>
+<p>Columns of locked influences have gray cells and cannot be edited. Locks are shared with the influence list, so toggling in either place is reflected in both.</p>
+
+<p><strong>Cell actions</strong></p>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">Action</th><th>Function</th></tr>
+  <tr><td>Click / drag / <kbd>Ctrl</kbd> or <kbd>Shift</kbd> + click</td><td>Selects cells.</td></tr>
+  <tr><td>Select a cell and type a number (or double-click / <kbd>F2</kbd>)</td><td>Edits the value. When confirmed with <kbd>Enter</kbd>, the same value is entered into <strong>all selected cells</strong> (except locked columns).</td></tr>
+  <tr><td>Click an empty area of the table, a row header, or the top-left corner</td><td>Clears the cell selection and the influence selection.</td></tr>
+</table></div>
+
+<div class="note">
+  <p><strong>Normalization when entering values</strong></p>
+  <p>
+    When weight normalization of the skin cluster is ON, the weights of the influences you did not edit are scaled up or down,
+    keeping their original ratios, so that each vertex totals 1.0. The values of locked influences do not change.
+    If the entered value is larger than what remains after the locked weights, the entered value is reduced to fit.
+  </p>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="copy">9. Copy / Paste</h2>
+<p>
+  <span class="badge">13</span>What the <span class="ui">Copy</span> / <span class="ui">Paste</span> buttons handle depends on the <a href="#vertex-status">status</a>.
+  Copied data for vertices and for cells is stored separately. The Paste button shows the number of items that will be pasted, like <code>Paste (3)</code>.
+</p>
+
+<h3>When vertices are selected (Status: Vertex mode)</h3>
+<p>Copies vertex weights (the values of all influences) from vertex to vertex.</p>
+<ol>
+  <li>Select the source vertices <strong>one at a time, in order</strong> (<kbd>Shift</kbd> + click from the second one on).</li>
+  <li>Press <span class="ui">Copy</span>.</li>
+  <li>Select the destination vertices one at a time, in order, in the same way.</li>
+  <li>Press <span class="ui">Paste</span>. The weights are pasted in order: 1st source → 1st destination, 2nd → 2nd, and so on.</li>
+</ol>
+<ul>
+  <li>If only one vertex was copied, the same weights are pasted to all selected vertices.</li>
+  <li>You can also paste to another mesh. However, if an influence in the copied weights does not exist in the destination skin cluster, nothing is pasted and a warning is shown.</li>
+</ul>
+
+<h3>When cells are selected (Status: Cell mode)</h3>
+<p>Copies cell values in the weight table from cell to cell.</p>
+<ol>
+  <li>Select the source cells <strong>one at a time, in order</strong> (<kbd>Ctrl</kbd> + click from the second one on).</li>
+  <li>Press <span class="ui">Copy</span>.</li>
+  <li>Select the destination cells one at a time, in order, in the same way.</li>
+  <li>Press <span class="ui">Paste</span>. The values are pasted in the order selected.</li>
+</ol>
+<ul>
+  <li>If only one cell was copied, the same value is pasted to all selected cells.</li>
+  <li>Normalization after pasting is the same as when typing a value into a cell ("Normalization when entering values" in <a href="#vertex-table">Weight table</a>).</li>
+  <li>Cells selected together with <kbd>Shift</kbd> + click or by dragging are ordered as in the table (top row first, left column first).</li>
+</ul>
+
+<h3>Common to both</h3>
+<ul>
+  <li><strong>Locked influences are unlocked automatically before pasting.</strong> The unlocked influences are listed in the Script Editor and remain unlocked after pasting.</li>
+  <li>If the number copied differs from the number selected, items are paired from the beginning and the extras are not pasted (a warning is shown).</li>
+  <li>A paste can be undone with a single <kbd>Ctrl</kbd> + <kbd>Z</kbd> (including the automatic unlock).</li>
+</ul>
+
+<!-- ================================================================ -->
+<h2 id="workflow">10. Workflow examples</h2>
+
+<h3>Method 1: Shaping weights by painting</h3>
+<ol>
+  <li>Select a skinned mesh (its skin cluster is loaded automatically).</li>
+  <li>Press <span class="ui">Start Paint Mode</span>.</li>
+  <li>Lock the influences you do not want to change, and select the influence to paint in the influence list.</li>
+  <li>Press a preset (for example add <code>+0.02</code> or scale <code>x0.90</code>) and paint in layers little by little. Finish by evening things out with <span class="ui">Smooth</span>.</li>
+</ol>
+
+<h3>Method 2: Posing and fixing while watching the vertex flow</h3>
+<p>An example of fixing how an elbow collapses when bent. For details, see "<a href="#usage2">Method 2: Adjusting selected vertices with buttons</a>".</p>
+<ol>
+  <li>Select the elbow joint and rotate it about 90 degrees.</li>
+  <li>Switch the view to wireframe and press <span class="ui">Start Component Mode</span>.</li>
+  <li>Select the vertices of the collapsing edge loop on the inside of the elbow.</li>
+  <li>Select the upper arm joint in the influence list and press <code>+0.05</code> or <code>+0.01</code> until the collapse is fixed.</li>
+  <li>Select the vertices of the neighboring edge loop and adjust them the same way.</li>
+  <li>Finally, return the elbow joint's rotation to its original value.</li>
+</ol>
+
+<h3>Method 3: Fixing weights with numbers</h3>
+<ol>
+  <li>Press <span class="ui">Start Component Mode</span> and select the vertices to fix.</li>
+  <li>In the weight table, select the cells to fix (multiple cells allowed).</li>
+  <li>Type a number and press <kbd>Enter</kbd>, or adjust little by little with the <span class="ui">Add / Sub</span> presets.</li>
+</ol>
+
+<h3>Copying weights to symmetrical vertices</h3>
+<ol>
+  <li>Select the source vertices one at a time in order, then press <span class="ui">Copy</span>.</li>
+  <li>Select the destination vertices one at a time in the order matching the source, then press <span class="ui">Paste</span>.</li>
+</ol>
+<p>* If the left and right influence names differ (such as <code>L_arm</code> and <code>R_arm</code>), weights go to the influences with the same names. Left and right are not swapped.</p>
+
+<!-- ================================================================ -->
+<h2 id="notes">11. Notes</h2>
+<ul>
+  <li><strong>Recording the selection order:</strong> because the order in which vertices are selected is used, the tool turns on Maya's "Track selection order" (<code>selectPref -trackSelectionOrder</code>) when it starts. This is a Maya-wide setting, so it stays ON even after the tool is closed. For vertices selected before the tool was started, the selection order may not have been recorded; in that case they are ordered by vertex number.</li>
+  <li><strong>Display limit:</strong> the weight table can show up to 1000 vertices. Vertices beyond that are not shown (a message appears in the Script Editor).</li>
+  <li><strong>Undo:</strong> cell edits in the weight table, presets applied while cells are selected, and pastes can each be undone with a single <kbd>Ctrl</kbd> + <kbd>Z</kbd>. Presets applied while vertices are selected (with no cells selected) are written per selected influence, so if several influences are selected, multiple undos are needed. If any vertex had its value clamped to the 0 to 1 range, even more undos are needed. After Undo / Redo, the table and lock display are updated automatically.</li>
+  <li><strong>Messages:</strong> warnings and results are shown in Maya's Script Editor and on the status line.</li>
+  <li><strong>Multiple shapes:</strong> objects with multiple shapes under one transform may give unexpected results (a warning is shown).</li>
+</ul>
+
+<footer>
+  skinning_tools_qt ver 1.0.5 / created by gadget-design T.Kondo /
+  <a href="https://www.gadget-design.com">www.gadget-design.com</a>
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>skinning_tools_qt マニュアル</title>
+<style>
+  :root {
+    --bg: #f7f7f5;
+    --surface: #ffffff;
+    --text: #1f2328;
+    --muted: #5d6470;
+    --border: #d9dce1;
+    --accent: #3d6fa8;
+    --accent-soft: #e6eef7;
+    --code-bg: #f0f1f3;
+    --note-bg: #fff7e0;
+    --note-border: #e3b341;
+    --badge: #c2410c;
+    --mock-bg: #444444;
+    --mock-panel: #2b2b2b;
+    --mock-head: #5d5d5d;
+    --mock-btn: #66666f;
+    --mock-text: #e6e6e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17191c;
+      --surface: #1f2226;
+      --text: #e4e6ea;
+      --muted: #9aa1ab;
+      --border: #343840;
+      --accent: #7fb0e8;
+      --accent-soft: #24303d;
+      --code-bg: #272b31;
+      --note-bg: #2e2915;
+      --note-border: #a8862d;
+      --badge: #fb923c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17191c;
+    --surface: #1f2226;
+    --text: #e4e6ea;
+    --muted: #9aa1ab;
+    --border: #343840;
+    --accent: #7fb0e8;
+    --accent-soft: #24303d;
+    --code-bg: #272b31;
+    --note-bg: #2e2915;
+    --note-border: #a8862d;
+    --badge: #fb923c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", "Hiragino Sans", "Yu Gothic UI", "Meiryo", sans-serif;
+    line-height: 1.75;
+    font-size: 15px;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 32px 16px 80px; }
+  header h1 { font-size: 28px; margin: 0 0 4px; }
+  header .ver { color: var(--muted); margin: 0; }
+  nav.toc {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 14px 20px; margin: 24px 0 8px;
+  }
+  nav.toc ol { margin: 4px 0; padding-left: 22px; }
+  nav.toc a { color: var(--accent); text-decoration: none; }
+  nav.toc a:hover { text-decoration: underline; }
+  h2 {
+    font-size: 21px; margin: 44px 0 12px; padding-bottom: 6px;
+    border-bottom: 2px solid var(--border);
+  }
+  h3 { font-size: 17px; margin: 28px 0 8px; }
+  p, li { max-width: 100%; }
+  code, kbd {
+    font-family: Consolas, "Courier New", monospace; font-size: 13px;
+    background: var(--code-bg); border-radius: 4px; padding: 1px 5px;
+  }
+  kbd { border: 1px solid var(--border); }
+  pre {
+    background: var(--code-bg); border-radius: 6px; padding: 12px 14px;
+    overflow-x: auto; font-size: 13px; line-height: 1.55;
+  }
+  pre code { background: none; padding: 0; }
+  .ui { font-weight: 600; }
+  .en { color: var(--muted); font-size: 13px; }
+  table {
+    border-collapse: collapse; width: 100%; margin: 10px 0 14px;
+    background: var(--surface); font-size: 14px;
+  }
+  th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--accent-soft); font-weight: 600; }
+  .table-scroll { overflow-x: auto; }
+  .note {
+    background: var(--note-bg); border-left: 4px solid var(--note-border);
+    padding: 10px 14px; border-radius: 4px; margin: 14px 0;
+  }
+  .note p { margin: 4px 0; }
+  tr.pickup td { background: var(--accent-soft); }
+  .tag {
+    display: inline-block; background: var(--badge); color: #fff; font-size: 11px; font-weight: 700;
+    border-radius: 3px; padding: 0 6px; margin-top: 2px;
+  }
+  .note ul { margin: 4px 0; padding-left: 20px; }
+  .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 22px; height: 22px; border-radius: 11px; padding: 0 6px;
+    background: var(--badge); color: #fff; font-size: 12px; font-weight: 700;
+    margin-right: 6px; vertical-align: 1px;
+  }
+
+  /* 画面構成の模式図 */
+  .layout { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; margin: 12px 0; }
+  .mock {
+    width: 320px; max-width: 100%; flex: none;
+    background: var(--mock-bg); color: var(--mock-text); border-radius: 6px;
+    padding: 4px; font-size: 11px; line-height: 1.3; border: 1px solid #222;
+  }
+  .mock .row { display: flex; gap: 3px; margin: 3px 0; align-items: center; position: relative; }
+  .mock .menu { gap: 10px; padding: 2px 4px; }
+  .mock .head { background: var(--mock-head); padding: 3px 6px; font-weight: 700; margin-top: 4px; }
+  .mock .btn { background: var(--mock-btn); border-radius: 2px; padding: 3px 4px; text-align: center; flex: 1; }
+  .mock .small { flex: none; padding: 3px 6px; }
+  .mock .field { background: #222; flex: 1; height: 16px; border-radius: 2px; }
+  .mock .list { background: var(--mock-panel); height: 70px; flex: 1; }
+  .mock .lower { background: #333; padding: 3px; }
+  .mock .r { background: #8a3b3b; } .mock .b { background: #3b3bb0; }
+  .mock .pr { background: #8c7575; } .mock .pb { background: #75758c; }
+  .mock .split { height: 8px; background: #5e5e72; margin: 5px 0; position: relative; }
+  .mock .status { color: #e6d933; padding: 2px 4px; }
+  .mock .tbl { background: var(--mock-panel); height: 80px; flex: 1; position: relative; }
+  .mock .tbl .colhead { position: absolute; left: 22px; top: 0; width: 44px; height: 28px; background: #8c5a2e; }
+  .mock .pin {
+    position: absolute; right: -14px; top: 50%; transform: translateY(-50%);
+    background: var(--badge); color: #fff; border-radius: 9px; min-width: 18px; height: 18px;
+    font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+    padding: 0 4px; z-index: 1;
+  }
+  .mock .body { padding-right: 16px; }
+  .legend { flex: 1; min-width: 260px; margin: 0; padding-left: 0; list-style: none; }
+  .legend li { margin: 3px 0; }
+
+  footer { margin-top: 56px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); padding-top: 12px; }
+  footer a { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    body { font-size: 14px; }
+    header h1 { font-size: 23px; }
+    .mock { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>skinning_tools_qt マニュアル</h1>
+  <p class="ver">ver 1.0.5 ／ Maya 2022 以降（PySide2 / PySide6 両対応）</p>
+</header>
+
+<nav class="toc" aria-label="目次">
+  <strong>目次</strong>
+  <ol>
+    <li><a href="#files">ファイル構成</a></li>
+    <li><a href="#launch">起動方法</a></li>
+    <li><a href="#overview">概要</a></li>
+    <li><a href="#usage">3 つの使い方</a>（<a href="#usage2">頂点を選んでボタンで調整する</a>）</li>
+    <li><a href="#layout">画面構成</a></li>
+    <li><a href="#menu">メニュー</a></li>
+    <li><a href="#paint">スキンウェイトのペイント</a></li>
+    <li><a href="#vertex">頂点ウェイトの設定</a></li>
+    <li><a href="#copy">コピー / ペースト</a></li>
+    <li><a href="#workflow">作業例</a></li>
+    <li><a href="#notes">注意事項</a></li>
+  </ol>
+</nav>
+
+<!-- ================================================================ -->
+<h2 id="files">1. ファイル構成</h2>
+<p>skinning_tools_qt は、次の 3 つのファイルでできています。</p>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">ファイル</th><th>内容</th></tr>
+  <tr><td><code>skinning_tools_qt.py</code></td><td>ツール本体（Python スクリプト）</td></tr>
+  <tr><td><code>skinning_tools_qt_manual_Jpn.html</code></td><td>このマニュアル（日本語）</td></tr>
+  <tr><td><code>skinning_tools_qt_manual_Eng.html</code></td><td>マニュアル（英語）</td></tr>
+</table></div>
+<p>
+  2 つのマニュアルは、<strong><code>skinning_tools_qt.py</code> と同じフォルダ</strong>に置いてください。
+  ツールの <a href="#menu">ヘルプメニュー</a>の <span class="ui">マニュアル (日本語)</span> / <span class="ui">マニュアル (英語)</span> は、py ファイルと同じ場所にあるこれらのファイルを開きます。
+  別の場所に置くと、マニュアルを開けません。
+</p>
+
+<!-- ================================================================ -->
+<h2 id="launch">2. 起動方法</h2>
+<p>Maya のスクリプトエディタの <strong>Python</strong> タブで、次を実行します。<code>path</code> は <code>skinning_tools_qt.py</code> を置いた場所に書き換えてください。</p>
+<pre><code>path = r"C:/tools/skinning_tools_qt.py"
+with open(path, encoding="utf-8") as f:
+    exec(compile(f.read(), path, "exec"))</code></pre>
+<p>スクリプトのフォルダに置いて <code>import</code> する場合は、次のように <code>main()</code> を呼びます。</p>
+<pre><code>import skinning_tools_qt
+skinning_tools_qt.main()</code></pre>
+<p>
+  すでにウィンドウが開いているときは、閉じてから開き直します。
+  シェルフのボタンに登録しておくと便利です。
+</p>
+
+<!-- ================================================================ -->
+<h2 id="overview">3. 概要</h2>
+<p>
+  skinning_tools_qt は、Maya のスキンウェイト作業をまとめて行うためのツールです。
+  ひとつのウィンドウで次の作業ができます。
+</p>
+<ul>
+  <li><span class="ui">スキンウェイトのペイント</span>：Maya 標準のスキンウェイトペイントツールを、インフルエンスリスト・プリセット付きで操作する</li>
+  <li><span class="ui">頂点ウェイトの設定１</span>：選択した頂点(エッジ、フェイス)のウェイトを、ボタンで少しずつ足し引きする。</li>
+  <li><span class="ui">頂点ウェイトの設定２</span>：選択した頂点(エッジ、フェイス)のウェイトを、表（ウェイト表）で確認し、数値で直接編集する</li>
+  <li><span class="ui">コピー / ペースト</span>：頂点のウェイトや、表のセルの値を、選択した順にコピー・ペーストする</li>
+  <li>インフルエンスのロック（ホールド）、追加・除去、未使用インフルエンスの除去など</li>
+</ul>
+<p>ウェイトの調整のしかたは 3 通りあります。次の章「<a href="#usage">3 つの使い方</a>」をまず読んでください。</p>
+<p>
+  画面は日本語と英語を切り替えられます（<a href="#menu-language">言語メニュー</a>）。このマニュアルでは日本語表示の名前で説明し、
+  英語表示の名前を <span class="en">（English）</span> のように併記します。
+</p>
+
+<!-- ================================================================ -->
+<h2 id="usage">4. 3種類のウェイト調整の方法</h2>
+<p>このツールでは、次の 3種類の方法でウェイトを調整できます。目的に合わせて使い分けたり、組み合わせたりします。</p>
+<div class="table-scroll"><table>
+  <tr><th style="width:30%">ウェイト調整方法</th><th>操作</th><th style="width:28%">向いている作業</th></tr>
+  <tr><td><strong>[方法1]. ブラシで塗る</strong></td>
+      <td><span class="ui">ペイントモード開始</span> を押し、ブラシでウェイトを塗る</td>
+      <td>広い範囲を大まかに整える、なめらかにする</td></tr>
+  <tr class="pickup"><td><strong>[方法2]. 頂点を選んで 増減ボタンで調整する</strong><br></td>
+      <td>頂点を選択し、<code>+0.01</code> / <code>-0.01</code> などのボタンを押す（表のセルは選ばない）</td>
+      <td>ポーズを付けた状態で、頂点の流れを見ながら細かく直す</td></tr>
+  <tr><td><strong>[方法3]. ウェイト表のセルで調整する</strong></td>
+      <td>頂点を選択し、ウェイト表のセルを選んで、増減ボタンを押すか数値を入力する</td>
+      <td>決まった値を正確に入れる、特定の頂点・インフルエンスだけを直す</td></tr>
+</table></div>
+<ul>
+  <li>方法1 の詳しい説明は「<a href="#paint">スキンウェイトのペイント</a>」、方法3 は「<a href="#vertex-table">ウェイト表</a>」を見てください。</li>
+  <li>方法2 と 3 は同じボタン（<a href="#vertex-preset">加算 / 減算プリセット</a>）を使います。どちらになるかは、ウェイト表のセルを選んでいるかどうかで決まり、<a href="#vertex-status">ステータス</a>の表示で見分けられます。</li>
+</ul>
+
+<h3 id="usage2">[方法 2]「頂点を選んでボタンで調整する について</h3>
+<p>
+  ウェイト表のセルを選ばずに、<strong>選択した頂点</strong>のウェイトをボタンで足し引きする方法です。
+  インフルエンス（ジョイント）を一時的に移動・回転させてメッシュを変形させた状態で、
+  ワイヤフレーム表示の頂点の流れ（エッジループ）を見ながら、選んだ頂点のウェイトを少しずつ調整できます。
+  ボタンを押すたびにメッシュの変形がすぐ変わるので、結果を目で確かめながら作業できます。
+</p>
+
+<p><strong>手順</strong></p>
+<ol>
+  <li>スキンを適用したメッシュを選択します。スキンクラスターがツールに読み込まれます。</li>
+  <li>調整したい部分のインフルエンス（ジョイントなど）を<strong>一時的に移動・回転</strong>させて、変形が見えるポーズにします。</li>
+  <li><span class="ui">コンポーネントモード開始</span> を押し、調整したい頂点を選択します。<a href="#vertex-status">ステータス</a>が <span class="ui">ステータス：バーテックス</span> になります。</li>
+  <li>インフルエンスリスト（またはウェイト表の列見出しの名前）で、ウェイトを増やしたい / 減らしたいインフルエンスを選択します。</li>
+  <li><span class="ui">頂点ウェイトの設定</span> の <span class="ui">加算</span>（<code>+0.001</code>〜<code>+0.10</code>）/ <span class="ui">減算</span>（<code>-0.001</code>〜<code>-0.10</code>）のボタンを押します。選択中のすべての頂点に、その値が足し引きされます。</li>
+  <li>変形による頂点の流れ（エッジループ）を見ながら、4〜6 をくり返します。頂点の選び直し、インフルエンスの選び直しは何度でもできます。</li>
+  <li>終わったら、移動・回転させたインフルエンスを元の位置・角度に戻します。</li>
+</ol>
+
+<div class="note">
+  <p><strong>ポイント</strong></p>
+  <ul>
+    <li><strong>セルを選ばないこと：</strong>ウェイト表のセルを選んでいると、増減ボタンはセルに対して働きます（使い方 3）。セルの選択は、表の空いている所をクリックするか、列見出しの名前をクリックすると外れます。</li>
+    <li><strong>ボタンの使い分け：</strong><code>±0.10</code> / <code>±0.05</code> で大まかに、<code>±0.01</code> / <code>±0.001</code> で細かく合わせます。</li>
+    <li><strong>ほかのインフルエンスへの影響：</strong>ウェイトの正規化が ON のときは、足した分だけほかのインフルエンスのウェイトが減ります（減らしたときは増えます）。動かしたくないインフルエンスは、先に<a href="#paint-list">ロック</a>しておくと値が変わりません。</li>
+    <li><strong>複数のインフルエンス：</strong>インフルエンスを複数選んでいると、それぞれに同じ値を足し引きします。</li>
+    <li><strong>値の範囲：</strong>結果は 0〜1 に収まります。</li>
+    <li>選んだインフルエンスがロック中のときは、メッセージを出してそこで止まります。アンロックしてから押し直してください。</li>
+    <li>ウェイト表には選択中の頂点の値が出るので、ボタンを押したときの値の変化も確認できます。</li>
+  </ul>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="layout">5. 画面構成</h2>
+<p>ウィンドウは上下 2 つのブロックに分かれています。番号は、下の説明の番号に対応しています。</p>
+
+<div class="layout">
+  <div class="mock" role="img" aria-label="skinning_tools_qt のウィンドウの模式図">
+    <div class="row menu body">編集　リスト　ツール　言語　ヘルプ<span class="pin">1</span></div>
+    <div class="head">▼ スキンウェイトのペイント</div>
+    <div class="row body"><div class="btn">ペイントモード開始</div><div class="btn">ペイントモード終了</div><span class="pin">2</span></div>
+    <div class="row body"><div class="btn small">🔒全てロック</div><div class="btn small">全てアンロック</div><div class="field"></div><span class="pin">3</span></div>
+    <div class="row body"><div class="list"></div><span class="pin">4</span></div>
+    <div class="lower body">
+      <div class="row"><div class="btn small">G</div><div class="btn small">P</div><div class="btn small">S</div><span style="flex:1">○置き換え ○追加…</span><div class="btn small">カラー/白黒</div><span class="pin">5</span></div>
+      <div class="row"><span style="flex:1">不透明度 ▭━━━━<br>値　　　 ▭━━━━</span><div class="btn small">塗りつぶす</div><span class="pin">6</span></div>
+      <div class="row"><span>加算</span><div class="btn small r">+0.01</div><div class="btn small r">+0.10</div><span>乗算</span><div class="btn small b">x0.90</div><span class="pin">7</span></div>
+    </div>
+    <div class="split body"><span class="pin">8</span></div>
+    <div class="head">▼ 頂点ウェイトの設定:</div>
+    <div class="row body"><div class="btn">コンポーネントモード開始</div><div class="btn">終了</div><span class="pin">9</span></div>
+    <div class="row body"><span>加算:</span><div class="btn small pr">+0.01</div><span>減算:</span><div class="btn small pb">-0.01</div><span class="pin">10</span></div>
+    <div class="row body status">ステータス：バーテックス<span class="pin">11</span></div>
+    <div class="row body"><div class="tbl"><div class="colhead"></div></div><span class="pin">12</span></div>
+    <div class="row body"><div class="btn">コピー</div><div class="btn">ペースト</div><span class="pin">13</span></div>
+    <div class="row body"><div class="btn">閉じる</div><span class="pin">14</span></div>
+  </div>
+
+  <ol class="legend">
+    <li><span class="badge">1</span><a href="#menu">メニューバー</a></li>
+    <li><span class="badge">2</span><a href="#paint-mode">ペイントモード開始 / 終了</a></li>
+    <li><span class="badge">3</span><a href="#paint-lock">全てロック / 全てアンロック・スキンクラスター欄</a></li>
+    <li><span class="badge">4</span><a href="#paint-list">インフルエンスリスト</a></li>
+    <li><span class="badge">5</span><a href="#paint-brush">ブラシ形状・ペイント操作・カラー / 白黒</a></li>
+    <li><span class="badge">6</span><a href="#paint-value">不透明度・値・塗りつぶす</a></li>
+    <li><span class="badge">7</span><a href="#paint-preset">プリセット（加算 / 乗算）</a></li>
+    <li><span class="badge">8</span><a href="#layout-split">分割バー</a></li>
+    <li><span class="badge">9</span><a href="#vertex-mode">コンポーネントモード開始 / 終了</a></li>
+    <li><span class="badge">10</span><a href="#vertex-preset">加算 / 減算プリセット</a></li>
+    <li><span class="badge">11</span><a href="#vertex-status">ステータス</a></li>
+    <li><span class="badge">12</span><a href="#vertex-table">ウェイト表</a></li>
+    <li><span class="badge">13</span><a href="#copy">コピー / ペースト</a></li>
+    <li><span class="badge">14</span>閉じる <span class="en">（Close）</span>：ウィンドウを閉じます</li>
+  </ol>
+</div>
+
+<h3 id="layout-split">ブロックの折りたたみと分割バー</h3>
+<ul>
+  <li>ブロックの見出し（<span class="ui">▼ スキンウェイトのペイント</span> など）をクリックすると、そのブロックを折りたたみ / 展開できます。折りたたむと、その分ウィンドウの高さが縮みます。</li>
+  <li>2 つのブロックの間の分割バー <span class="badge">8</span> を上下にドラッグすると、それぞれの高さの比率を変えられます。</li>
+</ul>
+
+<!-- ================================================================ -->
+<h2 id="menu">6. メニュー</h2>
+
+<h3>編集 <span class="en">（Edit）</span></h3>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">項目</th><th>はたらき</th></tr>
+  <tr><td>選択オブジェクトを自動で読み込む <span class="en">（Auto Load Object）</span></td>
+      <td>ON（初期状態）のとき、シーンで選択したオブジェクトのスキンクラスターを自動でツールに読み込みます。OFF にすると、読み込んだスキンクラスターが固定されます。</td></tr>
+  <tr><td>選択オブジェクトを読み込む <span class="en">（Load Selected Object）</span></td>
+      <td>選択中のオブジェクトのスキンクラスターを読み込みます。自動読み込みを OFF にしているときに使います。</td></tr>
+</table></div>
+
+<h3>リスト <span class="en">（List）</span></h3>
+<p>インフルエンスリストの並び順を選びます。</p>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">項目</th><th>並び順</th></tr>
+  <tr><td>名前順 <span class="en">（Alphabetical）</span>／名前順 (逆順)</td><td>インフルエンス名のアルファベット順（初期状態）／その逆</td></tr>
+  <tr><td>グラフ順 <span class="en">（Graph Order）</span>／グラフ順 (逆順)</td><td>スキンクラスターに登録されている順／その逆</td></tr>
+  <tr><td>ロック中をリスト後ろへ <span class="en">（Hold）</span></td><td>ロックしていないインフルエンスを前に、ロック中のものを後ろに並べます</td></tr>
+  <tr><td>ロック中をリスト前へ <span class="en">（Reverse Hold）</span></td><td>ロック中のインフルエンスを前に並べます</td></tr>
+</table></div>
+
+<h3>ツール <span class="en">（Tools）</span></h3>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">項目</th><th>はたらき</th></tr>
+  <tr><td>影響ポイントを選択 <span class="en">（Select Affected Points）</span></td>
+      <td>リストで選択中のインフルエンスが、0 より大きいウェイトを持つ頂点をすべて選択します。頂点数が多いと時間がかかります（Maya 画面下の進行状況バーが出ている間は <kbd>Esc</kbd> で中断できます）。</td></tr>
+  <tr><td>未使用インフルエンスの除去 <span class="en">（Remove Unused Influences）</span></td>
+      <td>Maya 標準の「未使用インフルエンスの除去」を実行し、リストを更新します。対象のスキンオブジェクトを選択してから使います。</td></tr>
+  <tr><td>インフルエンスの追加 / 除去 ▶ インフルエンスの追加 <span class="en">（Add Influences）</span></td>
+      <td>シーンで選択したジョイントなどを、読み込み中のスキンクラスターにインフルエンスとして追加します（ウェイト 0 で追加）。すでにインフルエンスのものはスキップします。</td></tr>
+  <tr><td>インフルエンスの追加 / 除去 ▶ インフルエンスの除去 <span class="en">（Remove Influences）</span></td>
+      <td>リストで選択中のインフルエンスを、スキンクラスターから外します。確認ダイアログが出ます。</td></tr>
+</table></div>
+
+<h3 id="menu-language">言語 <span class="en">（Language）</span></h3>
+<p>
+  <span class="ui">日本語</span> / <span class="ui">English</span> を選ぶと、画面の表示言語が切り替わります。
+  ウィンドウは自動で作り直されますが、位置・大きさ・リストの並び順・インフルエンスの選択などは引き継がれます。
+  選んだ言語は保存され、次回の起動でも同じ言語で開きます（初期状態は日本語）。
+</p>
+
+<h3>ヘルプ <span class="en">（Help）</span></h3>
+<p>
+  <span class="ui">マニュアル (日本語)</span> <span class="en">（Manual (Japanese)）</span> / <span class="ui">マニュアル (英語)</span> <span class="en">（Manual (English)）</span>で、このマニュアルの日本語版 / 英語版をダイアログで表示します。<br>
+  <span class="ui">skinning_tools_qt について</span> <span class="en">（About skinning_tools_qt）</span>で、ツール名・バージョン・作者を表示します。
+  作者名をクリックすると、Web ブラウザで作者のサイトが開きます。
+</p>
+
+<!-- ================================================================ -->
+<h2 id="paint">7. スキンウェイトのペイント</h2>
+
+<h3 id="paint-mode"><span class="badge">2</span>ペイントモード開始 / 終了</h3>
+<ul>
+  <li><span class="ui">ペイントモード開始</span> <span class="en">（Start Paint Mode）</span>：読み込み中のスキンクラスターのジオメトリを選択し、スムーズシェーディング表示にして、Maya のスキンウェイトペイントツールに入ります。リストで何も選択していないときは、ペイントツールで現在ペイント対象のインフルエンスをリストで選択します。</li>
+  <li><span class="ui">ペイントモード終了</span> <span class="en">（End Paint Mode）</span>：選択ツールに戻ります。</li>
+</ul>
+
+<h3 id="paint-lock"><span class="badge">3</span>全てロック / 全てアンロック・スキンクラスター欄</h3>
+<ul>
+  <li><span class="ui">全てロック</span> / <span class="ui">全てアンロック</span>：リストのすべてのインフルエンスのウェイトをロック / アンロックします。</li>
+  <li><span class="ui">スキンクラスター</span>欄：読み込み中のスキンクラスター名です。名前を入力して <kbd>Enter</kbd> で、そのスキンクラスターを読み込みます。
+      右クリックで <span class="ui">スキンクラスターノードを選択</span> / <span class="ui">ジオメトリを選択</span> ができます。</li>
+</ul>
+
+<h3 id="paint-list"><span class="badge">4</span>インフルエンスリスト</h3>
+<p>スキンクラスターのインフルエンスの一覧です。リストで選んだインフルエンスがペイントの対象になります。</p>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">操作</th><th>はたらき</th></tr>
+  <tr><td>名前をクリック</td><td>インフルエンスを選択し、ペイント対象にします。<kbd>Ctrl</kbd> + クリックで追加 / 解除、<kbd>Shift</kbd> + クリックで範囲選択です。</td></tr>
+  <tr><td>1 つだけ選択中の名前をもう一度クリック</td><td>選択を解除します。</td></tr>
+  <tr><td>左端のロックボタンをクリック</td><td>そのインフルエンスのウェイトをロック / アンロックします。選択中のインフルエンスのボタンを押すと、選択中のものすべてを同じ状態にします。</td></tr>
+  <tr><td>ロックボタンを押したまま上下にドラッグ</td><td>なぞった行を、押した行と同じロック状態にします。</td></tr>
+  <tr><td>名前をダブルクリック</td><td>ロック / アンロックを切り替えます。複数選択中のどれかをダブルクリックすると、選択中のものをまとめて切り替えます。</td></tr>
+  <tr><td>右クリック</td><td>メニューを出します（下表）。</td></tr>
+</table></div>
+<p>ロック中のインフルエンスは、名前が暗い色になり、後ろに <code>(ロック)</code> が付きます。</p>
+
+<p><strong>右クリックメニュー</strong></p>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">項目</th><th>はたらき</th></tr>
+  <tr><td>ロック / アンロック <span class="en">（Hold/Unhold）</span></td><td>選択中のインフルエンスのロック状態を、それぞれ反転します。</td></tr>
+  <tr><td>全てロック / 全てアンロック</td><td>すべてのインフルエンスをロック / アンロックします。</td></tr>
+  <tr><td>インフルエンスを選択 <span class="en">（Select Influence(s)）</span></td><td>リストで選択中のインフルエンスを、シーンで選択します。</td></tr>
+  <tr><td>影響を受けるポイントを選択</td><td>ツールメニューの「影響ポイントを選択」と同じです。</td></tr>
+  <tr><td>選択中のインフルエンスをリストで選択 <span class="en">（Reveal selected influence）</span></td><td>シーンで選択しているジョイントを、リストで選択します。</td></tr>
+</table></div>
+
+<h3 id="paint-brush"><span class="badge">5</span>ブラシ形状・ペイント操作・カラー / 白黒</h3>
+<ul>
+  <li><span class="ui">ブラシ形状</span>：左から ガウス / ポリゴン / ソリッド です。</li>
+  <li><span class="ui">ペイント操作</span>：置き換え <span class="en">（Replace）</span> / 追加 <span class="en">（Add）</span> / スケール <span class="en">（Scale）</span> / スムーズ <span class="en">（Smooth）</span>。選んだ操作は次回の起動でも引き継がれます。</li>
+  <li><span class="ui">カラー / 白黒</span> <span class="en">（Color or Mono）</span>：ペイント中のウェイトの表示を、カラーとモノクロで切り替えます。</li>
+</ul>
+
+<h3 id="paint-value"><span class="badge">6</span>不透明度・値・塗りつぶす</h3>
+<ul>
+  <li><span class="ui">不透明度</span> <span class="en">（Opac）</span> / <span class="ui">値</span> <span class="en">（Val）</span>：ペイントツールの不透明度と値です。数値欄に入力するか、スライダーで変えます。設定は次回の起動でも引き継がれます。</li>
+  <li><span class="ui">塗りつぶす</span> <span class="en">（Flood）</span>：選択中のインフルエンスに、今の操作・不透明度・値で、ジオメトリ全体を塗りつぶします。ペイントモード中だけ使えます。</li>
+</ul>
+
+<h3 id="paint-preset"><span class="badge">7</span>プリセット（加算 / 乗算）</h3>
+<p>ボタンを押すと、ペイント操作と値をまとめて設定します。</p>
+<ul>
+  <li><span class="ui">加算</span>（赤いボタン <code>+0.01</code> / <code>+0.02</code> / <code>+0.10</code> / <code>+0.20</code>）：操作を「追加」にし、値をその数値にします。</li>
+  <li><span class="ui">乗算</span>（青いボタン <code>x0.80</code> / <code>x0.90</code> / <code>x0.98</code> / <code>x0.99</code>）：操作を「スケール」にし、値をその数値にします。</li>
+</ul>
+<p>ウィンドウの幅が狭いときは、ボタンが次の行に折り返されます。</p>
+
+<!-- ================================================================ -->
+<h2 id="vertex">8. 頂点ウェイトの設定</h2>
+
+<h3 id="vertex-mode"><span class="badge">9</span>コンポーネントモード開始 / 終了</h3>
+<ul>
+  <li><span class="ui">コンポーネントモード開始</span>：読み込み中のスキンクラスターのジオメトリを選択し、コンポーネント（頂点）選択モードにします。
+      頂点だけでなく、<strong>エッジやフェイスを選択しても</strong>、その上の頂点がウェイト表に表示され、ウェイトを操作できます（<a href="#vertex-edge-face">エッジ / フェイスを選択したとき</a>）。</li>
+  <li><span class="ui">コンポーネントモード終了</span>：オブジェクト選択モードに戻ります。</li>
+</ul>
+
+<h3 id="vertex-preset"><span class="badge">10</span>加算 / 減算プリセット</h3>
+<p><code>+0.001</code> / <code>+0.01</code> / <code>+0.05</code> / <code>+0.10</code> と、そのマイナスのボタンで、ウェイトに値を足し引きします。対象は次のとおりです。</p>
+<ul>
+  <li><strong>セルを選択していないとき（ステータス：バーテックス）</strong>：シーンで選択中のすべての頂点の、インフルエンスリストで選択中のインフルエンス。
+      → <a href="#usage2">使い方 2：頂点を選んでボタンで調整する</a></li>
+  <li><strong>ウェイト表のセルを選択しているとき（ステータス：セル）</strong>：選択中のセル。
+      → 使い方 3（<a href="#vertex-table">ウェイト表</a>）</li>
+</ul>
+<p>結果は 0〜1 の範囲に収まります。ロック中のインフルエンスの値は変更されません（頂点を選択中に、ロック中のインフルエンスを選んで押すと、メッセージを出してそこで止まります）。</p>
+
+<h3 id="vertex-status"><span class="badge">11</span>ステータス</h3>
+<p>ウェイト表の上に、今の選択の状態を表示します。<a href="#copy">コピー / ペースト</a>と<a href="#vertex-preset">プリセット</a>の対象は、この表示で見分けられます。</p>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">表示</th><th>状態</th></tr>
+  <tr><td>ステータス：（白）</td><td>頂点もセルも選択していない</td></tr>
+  <tr><td>ステータス：バーテックス（黄色）</td><td>シーンで頂点（エッジ・フェイス）を選択している</td></tr>
+  <tr><td>ステータス：セル（青）</td><td>ウェイト表のセルを選択している</td></tr>
+</table></div>
+<p>ウェイト表の<a href="#vertex-table">列見出し（インフルエンス名）</a>の色も、ステータスと同時に変わります。セルを選択しているときは<strong>青</strong>、それ以外（頂点を選択しているときなど）は<strong>オレンジ</strong>です。</p>
+
+<h3 id="vertex-table"><span class="badge">12</span>ウェイト表</h3>
+<p>選択した頂点のウェイトを一覧にした表です。行が頂点、列がインフルエンスです。</p>
+<ul>
+  <li><strong>表示する頂点</strong>：シーンで選択した頂点を、<strong>選択した順</strong>に並べます。頂点を選ばずにオブジェクトを選択しているときは、そのオブジェクトの全頂点を出します。表示は最大 1000 頂点までです。</li>
+  <li id="vertex-edge-face"><strong>エッジ / フェイスを選択したとき</strong>：選択したエッジ / フェイス上の頂点を表示します。エッジ / フェイスを選択した順に、それぞれの頂点を頂点番号順で並べます（隣り合うエッジ / フェイスで共有する頂点は 1 回だけ）。
+      頂点を選んだときと同じように、<a href="#vertex-preset">加算 / 減算プリセット</a>・<a href="#copy">コピー / ペースト</a>でウェイトを操作できます（エッジ / フェイス上の頂点が対象。表のセルを選べば、数値の入力やセルの操作もできます）。</li>
+  <li><strong>表示する列</strong>：表示中の頂点のどれかで、0 より大きいウェイトを持つインフルエンスだけを出します。</li>
+  <li><strong>表に無いインフルエンスを選んだとき</strong>：インフルエンスリストで、表に出ていないインフルエンスを選択すると、表の右端にその<strong>列見出し（名前）だけ</strong>を出します。列見出しの色はグレー系になり、下のセルは空欄で、選択・編集はできません。
+      見出しは選択中の色になり、ロックスイッチやクリックでの選択も使えます。リストで選択を外すと消えます。
+      <a href="#vertex-preset">加算プリセット</a>などでウェイトが 0 より大きくなると、値の入った普通の列になります。</li>
+  <li>行見出しは頂点番号です。</li>
+  <li><strong>列見出しの色</strong>：セルを選択しているときは青、それ以外（頂点を選択しているときなど）はオレンジです（<a href="#vertex-status">ステータス</a>と同時に切り替わります）。選択中のインフルエンスの見出しは、それぞれ明るい色になります。</li>
+</ul>
+
+<p><strong>列見出し（インフルエンス名）の操作</strong></p>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">操作</th><th>はたらき</th></tr>
+  <tr><td>名前の部分をクリック</td><td>そのインフルエンスを選択します（インフルエンスリストの選択と連動し、ペイント対象も切り替わります）。<kbd>Ctrl</kbd> / <kbd>Shift</kbd> も使えます。セルを選択していたときは、セルの選択を解除します。</td></tr>
+  <tr><td>名前の部分をダブルクリック</td><td>ロック / アンロックを切り替えます。</td></tr>
+  <tr><td>下端の鍵のアイコンをクリック</td><td>ロック / アンロックを切り替えます。</td></tr>
+</table></div>
+<p>ロック中のインフルエンスの列は、セルが灰色になり編集できません。ロックはインフルエンスリストと共通なので、どちらで切り替えても両方に反映されます。</p>
+
+<p><strong>セルの操作</strong></p>
+<div class="table-scroll"><table>
+  <tr><th style="width:38%">操作</th><th>はたらき</th></tr>
+  <tr><td>クリック / ドラッグ / <kbd>Ctrl</kbd>・<kbd>Shift</kbd> + クリック</td><td>セルを選択します。</td></tr>
+  <tr><td>セルを選んで数字を入力（または ダブルクリック / <kbd>F2</kbd>）</td><td>値を編集します。<kbd>Enter</kbd> で確定すると、<strong>選択中のすべてのセル</strong>に同じ値が入ります（ロック中の列を除く）。</td></tr>
+  <tr><td>表の空いている所・行見出し・左上の角をクリック</td><td>セルの選択と、インフルエンスの選択を解除します。</td></tr>
+</table></div>
+
+<div class="note">
+  <p><strong>値を入れたときの正規化</strong></p>
+  <p>
+    スキンクラスターのウェイトの正規化が ON のときは、頂点ごとに合計が 1.0 になるよう、
+    入力していないインフルエンスのウェイトを元の比率のまま増減させます。ロック中のインフルエンスの値は変わりません。
+    入力値がロック分を除いた残りより大きいときは、入力値のほうを縮めて収めます。
+  </p>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="copy">9. コピー / ペースト</h2>
+<p>
+  <span class="badge">13</span><span class="ui">コピー</span> / <span class="ui">ペースト</span> ボタンは、<a href="#vertex-status">ステータス</a>によって、扱うものが変わります。
+  頂点用とセル用のコピー内容は別々に覚えています。ペーストボタンには、そのときペーストされる数が <code>ペースト (3)</code> のように表示されます。
+</p>
+
+<h3>頂点を選択しているとき（ステータス：バーテックス）</h3>
+<p>頂点のウェイト（すべてのインフルエンスの値）を、頂点から頂点へコピーします。</p>
+<ol>
+  <li>コピー元の頂点を、<strong>1 つずつ順番に</strong>選択します（2 つ目からは <kbd>Shift</kbd> + クリック）。</li>
+  <li><span class="ui">コピー</span> を押します。</li>
+  <li>ペースト先の頂点を、同じように 1 つずつ順番に選択します。</li>
+  <li><span class="ui">ペースト</span> を押すと、1 つ目のコピー元 → 1 つ目のペースト先、2 つ目 → 2 つ目…の順にウェイトが入ります。</li>
+</ol>
+<ul>
+  <li>コピーした頂点が 1 つだけのときは、選択したすべての頂点に同じウェイトを入れます。</li>
+  <li>別のメッシュにもペーストできます。ただし、コピーしたウェイトのインフルエンスがペースト先のスキンクラスターに無いときは、ペーストせずに警告を出します。</li>
+</ul>
+
+<h3>セルを選択しているとき（ステータス：セル）</h3>
+<p>ウェイト表のセルの値を、セルからセルへコピーします。</p>
+<ol>
+  <li>コピー元のセルを、<strong>1 つずつ順番に</strong>選択します（2 つ目からは <kbd>Ctrl</kbd> + クリック）。</li>
+  <li><span class="ui">コピー</span> を押します。</li>
+  <li>ペースト先のセルを、同じように 1 つずつ順番に選択します。</li>
+  <li><span class="ui">ペースト</span> を押すと、選んだ順に値が入ります。</li>
+</ol>
+<ul>
+  <li>コピーしたセルが 1 つだけのときは、選択したすべてのセルに同じ値を入れます。</li>
+  <li>ペースト後の正規化は、セルに数値を入力したときと同じです（<a href="#vertex-table">ウェイト表</a>の「値を入れたときの正規化」）。</li>
+  <li><kbd>Shift</kbd> + クリックやドラッグでまとめて選んだセルは、その中では表の並び順（上の行から、左の列から）になります。</li>
+</ul>
+
+<h3>どちらにも共通</h3>
+<ul>
+  <li><strong>ロック中のインフルエンスは、自動でアンロックしてからペーストします。</strong>アンロックしたインフルエンスはスクリプトエディタに表示され、ペースト後もアンロックのままです。</li>
+  <li>コピーした数と選択した数が違うときは、先頭から順に組にしてペーストし、余った分にはペーストしません（警告が出ます）。</li>
+  <li>ペーストは <kbd>Ctrl</kbd> + <kbd>Z</kbd> 1 回で元に戻せます（自動のアンロックも戻ります）。</li>
+</ul>
+
+<!-- ================================================================ -->
+<h2 id="workflow">10. 作業例</h2>
+
+<h3>使い方 1：ペイントでウェイトを整える</h3>
+<ol>
+  <li>スキンを適用したメッシュを選択します（スキンクラスターが自動で読み込まれます）。</li>
+  <li><span class="ui">ペイントモード開始</span> を押します。</li>
+  <li>動かしたくないインフルエンスをロックし、インフルエンスリストでペイントするインフルエンスを選びます。</li>
+  <li>プリセット（例：加算 <code>+0.02</code>、乗算 <code>x0.90</code>）を押して、少しずつ塗り重ねます。最後に <span class="ui">スムーズ</span> でならします。</li>
+</ol>
+
+<h3>使い方 2：ポーズを付けて、頂点の流れを見ながら直す</h3>
+<p>肘を曲げたときのつぶれ方を直す例です。詳しくは「<a href="#usage2">使い方 2：頂点を選んでボタンで調整する</a>」を見てください。</p>
+<ol>
+  <li>肘のジョイントを選択し、90 度ほど回転させます。</li>
+  <li>ビューをワイヤフレーム表示にし、<span class="ui">コンポーネントモード開始</span> を押します。</li>
+  <li>肘の内側でつぶれているエッジループの頂点を選択します。</li>
+  <li>インフルエンスリストで上腕のジョイントを選び、<code>+0.05</code> や <code>+0.01</code> を押して、つぶれが直るまで調整します。</li>
+  <li>隣のエッジループの頂点を選び直して、同じように調整します。</li>
+  <li>最後に、肘のジョイントの回転を元に戻します。</li>
+</ol>
+
+<h3>使い方 3：数値でウェイトを直す</h3>
+<ol>
+  <li><span class="ui">コンポーネントモード開始</span> を押し、直したい頂点を選択します。</li>
+  <li>ウェイト表で、直したいセルを選びます（複数可）。</li>
+  <li>数字を入力して <kbd>Enter</kbd>、または <span class="ui">加算 / 減算</span> のプリセットで少しずつ調整します。</li>
+</ol>
+
+<h3>左右対称の頂点にウェイトを写す</h3>
+<ol>
+  <li>写し元の頂点を 1 つずつ順に選択し、<span class="ui">コピー</span>。</li>
+  <li>写し先の頂点を、写し元と対応する順に 1 つずつ選択し、<span class="ui">ペースト</span>。</li>
+</ol>
+<p>※ 左右でインフルエンス名が違う（<code>L_arm</code> と <code>R_arm</code> など）場合、インフルエンスは名前どおりに入ります。左右の入れ替えは行いません。</p>
+
+<!-- ================================================================ -->
+<h2 id="notes">11. 注意事項</h2>
+<ul>
+  <li><strong>選択順の記録：</strong>頂点を選択した順を使うため、ツールの起動時に Maya の「選択順の記録」（<code>selectPref -trackSelectionOrder</code>）を ON にします。Maya 全体の設定なので、ツールを閉じても ON のままです。ツールを起動する前に選んでいた頂点は、選択順が記録されていないことがあります。その場合は頂点番号順になります。</li>
+  <li><strong>表示の上限：</strong>ウェイト表に出せるのは 1000 頂点までです。超えた分は表示されません（スクリプトエディタにメッセージが出ます）。</li>
+  <li><strong>Undo：</strong>ウェイト表でのセルの編集、セルを選択中のプリセット、ペーストは、それぞれ <kbd>Ctrl</kbd> + <kbd>Z</kbd> 1 回で元に戻せます。頂点を選択中（セルを選んでいないとき）のプリセットは、選んだインフルエンスごとに書き込むため、インフルエンスを複数選んでいると、元に戻すには複数回の Undo が必要になります。値が 0〜1 をはみ出して丸められた頂点があると、さらに回数が増えます。Undo / Redo の後は、表とロックの表示も自動で更新されます。</li>
+  <li><strong>メッセージ：</strong>警告や処理の結果は、Maya のスクリプトエディタとステータスラインに表示されます。</li>
+  <li><strong>複数のシェイプ：</strong>1 つのトランスフォームの下に複数のシェイプがあるオブジェクトでは、意図しない結果になることがあります（警告が出ます）。</li>
+</ul>
+
+<footer>
+  skinning_tools_qt ver 1.0.5 ／ created by gadget-design T.Kondo ／
+  <a href="https://www.gadget-design.com">www.gadget-design.com</a>
+</footer>
+
+</div>
+</body>
+</html>
