@@ -1,5 +1,5 @@
 日本語の案内は下部にあります。スクロールしてください。(Japanese information is available below. Please scroll down.)
-[![skinning_tools_qt](https://img.youtube.com/vi/Wv57cnTH2yA/maxresdefault.jpg)](https://www.youtube.com/watch?v=Wv57cnTH2yA)
+[![skinning_tools_qt](images/skinning_tools_qt_v105_youtube.png)](https://www.youtube.com/watch?v=Wv57cnTH2yA)
 
 English
 ===
