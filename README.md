@@ -1,8 +1,8 @@
 日本語の案内は下部にあります。スクロールしてください。(Japanese information is available below. Please scroll down.)
 ![image00](images/skinning_tools_qt_v105_img00.png)
-==============================
+
 English
-==============================
+_______________________
 
 skinning_tools_qt - All your Maya skin weight work in one window
 
@@ -69,9 +69,13 @@ Adding it to a shelf button is convenient.
 created by gadget-design T.Kondo
 http://www.gadget-design.com
 
-==============================
+![image00](images/skinning_tools_qt_v105_img01.png)
+![image00](images/skinning_tools_qt_v105_img02.png)
+![image00](images/skinning_tools_qt_v105_img03.png)
+
+
 日本語
-==============================
+_______________________
 
 skinning_tools_qt ― Maya のスキンウェイト作業を、ひとつのウィンドウで
 
