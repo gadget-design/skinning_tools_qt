@@ -2,7 +2,7 @@
 ![image00](images/skinning_tools_qt_v105_img00.png)
 
 English
-_______________________
+===
 
 skinning_tools_qt - All your Maya skin weight work in one window
 
@@ -73,9 +73,10 @@ http://www.gadget-design.com
 ![image00](images/skinning_tools_qt_v105_img02.png)
 ![image00](images/skinning_tools_qt_v105_img03.png)
 
-
-日本語
 _______________________
+日本語
+===
+
 
 skinning_tools_qt ― Maya のスキンウェイト作業を、ひとつのウィンドウで
 
