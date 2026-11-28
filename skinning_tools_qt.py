@@ -51,9 +51,10 @@ _TOOL_NAME = "skinning_tools_qt"
 _MANUALS = [("Manual (English)", "skinning_tools_qt_manual_Eng.html"),
             ("Manual (Japanese)", "skinning_tools_qt_manual_Jpn.html")]
 _MANUAL_WIN = "skinningToolsQtManual"
-_VERSION = "1.0.5"
+_VERSION = "1.0.6"
 _AUTHOR = "gadget-design T.Kondo"
 _AUTHOR_URL = "http://www.gadget-design.com"
+_UPDATE_URL = "https://github.com/gadget-design/skinning_tools_qt"
 
 _BLOCK_MARGIN_W = 5
 _BLOCK_MARGIN_H = 5
@@ -159,6 +160,8 @@ _JA = {
     "Manual (English)": u"マニュアル (英語)",
     "Manual not found: {}": u"マニュアルが見つかりません: {}",
     "About  {}": u"{} について",
+    "Update": u"アップデート",
+    "The latest version is available here:": u"最新版はこちらから入手できます:",
     "Paint Skin Weights": u"スキンウェイトのペイント",
     "Start Paint Mode": u"ペイントモード開始",
     "End Paint Mode": u"ペイントモード終了",
@@ -1789,26 +1792,7 @@ def _wt_apply_edits( cells, set_mode, value, values=None, unlock=False ):
         if not edited:
             continue
 
-        if normalize:
-            fixed = [k for k in range( len( all_infs ) ) if k not in edited and held[k]]
-            room = max( 0.0, 1.0 - sum( old[k] for k in fixed ) )
-            others = [k for k in range( len( all_infs ) ) if k not in edited and k not in fixed]
-            others_sum = sum( old[k] for k in others )
-            edited_sum = sum( new[k] for k in edited )
-            if others_sum > _WT_EPS:
-                if edited_sum > room:
-                    for k in edited:
-                        new[k] *= room / edited_sum
-                    edited_sum = room
-                for k in others:
-                    new[k] = old[k] * (room - edited_sum) / others_sum
-            elif edited_sum > _WT_EPS:
-                for k in edited:
-                    new[k] *= room / edited_sum
-            else:
-                continue
-
-        changed = [(all_infs[k], new[k]) for k in range( len( all_infs ) ) if abs( new[k] - old[k] ) > 1e-9]
+        changed = [(all_infs[k], new[k]) for k in edited if abs( new[k] - old[k] ) > 1e-9]
         if changed:
             writes.append( (vert, changed) )
 
@@ -1818,11 +1802,9 @@ def _wt_apply_edits( cells, set_mode, value, values=None, unlock=False ):
     try:
         for inf in unlocked:
             cmds.setAttr( inf + ".liw", 0 )
-        cmds.setAttr( skin_cluster + ".normalizeWeights", 0 )
         for vert, changed in writes:
-            cmds.skinPercent( skin_cluster, vert, transformValue=changed, normalize=False )
+            cmds.skinPercent( skin_cluster, vert, transformValue=changed, normalize=bool( normalize ) )
     finally:
-        cmds.setAttr( skin_cluster + ".normalizeWeights", normalize )
         cmds.undoInfo( closeChunk=True )
     return unlocked
 
@@ -2272,6 +2254,8 @@ class SkinningToolsWindow( QtWidgets.QWidget ):
         for label, file_name in _MANUALS:
             manual = help_menu.addAction( _tr( label ) )
             manual.triggered.connect( lambda *_, _l=label, _f=file_name: self._show_manual( _l, _f ) )
+        update = help_menu.addAction( _tr( "Update" ) )
+        update.triggered.connect( lambda *_: self._show_update() )
         about = help_menu.addAction( _tr( "About  {}" ).format( _TOOL_NAME ) )
         about.triggered.connect( lambda *_: self._show_about() )
         return bar
@@ -2324,6 +2308,29 @@ class SkinningToolsWindow( QtWidgets.QWidget ):
         ok_btn.clicked.connect( dialog.close )
         layout.addWidget( title )
         layout.addWidget( author )
+        layout.addWidget( ok_btn, 0, QtCore.Qt.AlignmentFlag.AlignRight )
+        dialog.show()
+
+    def _show_update( self ):
+        dialog = QtWidgets.QDialog( self )
+        dialog.setAttribute( QtCore.Qt.WidgetAttribute.WA_DeleteOnClose )
+        dialog.setWindowTitle( _tr( "Update" ) )
+        dialog.setWindowModality( QtCore.Qt.WindowModality.ApplicationModal )
+        layout = QtWidgets.QVBoxLayout( dialog )
+        layout.setContentsMargins( 24, 18, 24, 14 )
+        layout.setSpacing( 14 )
+        message = QtWidgets.QLabel( _tr( "The latest version is available here:" ) )
+        link = QtWidgets.QLabel( '<a href="%s">%s</a>' % (_UPDATE_URL, _UPDATE_URL) )
+        link.setTextInteractionFlags( QtCore.Qt.TextInteractionFlag.TextBrowserInteraction )
+        link.linkActivated.connect(
+            lambda url: ( QtGui.QDesktopServices.openUrl( QtCore.QUrl( url ) ), dialog.close() ))
+        link.setToolTip( _UPDATE_URL )
+        ok_btn = QtWidgets.QPushButton( "OK" )
+        ok_btn.setFixedWidth( 80 )
+        ok_btn.setToolTip( _tr( "Close this dialog." ) )
+        ok_btn.clicked.connect( dialog.close )
+        layout.addWidget( message )
+        layout.addWidget( link )
         layout.addWidget( ok_btn, 0, QtCore.Qt.AlignmentFlag.AlignRight )
         dialog.show()
 

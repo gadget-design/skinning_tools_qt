@@ -159,7 +159,7 @@
 
 <header>
   <h1>skinning_tools_qt Manual</h1>
-  <p class="ver">ver 1.0.5 / Maya 2022 or later (supports both PySide2 and PySide6)</p>
+  <p class="ver">ver 1.0.6 / Maya 2022 or later (supports both PySide2 and PySide6)</p>
 </header>
 
 <nav class="toc" aria-label="Contents">
@@ -176,6 +176,7 @@
     <li><a href="#copy">Copy / Paste</a></li>
     <li><a href="#workflow">Workflow examples</a></li>
     <li><a href="#notes">Notes</a></li>
+    <li><a href="#history">Version history</a></li>
   </ol>
 </nav>
 
@@ -373,6 +374,8 @@ skinning_tools_qt.main()</code></pre>
 <h3>Help</h3>
 <ul>
   <li><span class="ui">Manual (Japanese)</span> / <span class="ui">Manual (English)</span>: shows the Japanese / English manual (<code>skinning_tools_qt_manual_Jpn.html</code> / <code>skinning_tools_qt_manual_Eng.html</code> in the same folder as <code>skinning_tools_qt.py</code>) in a dialog.</li>
+  <li><span class="ui">Update</span>: shows where to get the latest version (<a href="https://github.com/gadget-design/skinning_tools_qt">https://github.com/gadget-design/skinning_tools_qt</a>) in a dialog.
+    Click the URL to open the site in a web browser and close the dialog.</li>
   <li><span class="ui">About skinning_tools_qt</span>: shows the tool name, version, and author.
     Click the author name to open the author's website in a web browser.</li>
 </ul>
@@ -501,9 +504,9 @@ skinning_tools_qt.main()</code></pre>
 <div class="note">
   <p><strong>Normalization when entering values</strong></p>
   <p>
-    When weight normalization of the skin cluster is ON, the weights of the influences you did not edit are scaled up or down,
-    keeping their original ratios, so that each vertex totals 1.0. The values of locked influences do not change.
-    If the entered value is larger than what remains after the locked weights, the entered value is reduced to fit.
+    The value you enter goes into the cell as it is.
+    When weight normalization of the skin cluster is ON, Maya's normalization adjusts the weights of the influences you did not edit
+    so that each vertex totals 1.0 (the same as entering a value in the Component Editor).
   </p>
 </div>
 
@@ -594,8 +597,15 @@ skinning_tools_qt.main()</code></pre>
   <li><strong>Multiple shapes:</strong> objects with multiple shapes under one transform may give unexpected results (a warning is shown).</li>
 </ul>
 
+<!-- ================================================================ -->
+<h2 id="history">12. Version history</h2>
+<ul>
+  <li><strong>v1.0.5</strong>: Released.</li>
+  <li><strong>v1.0.6</strong>: Values typed into weight table cells are now kept as entered (Maya's normalization adjusts the rest). Added Help &gt; Update and tooltips for the buttons.</li>
+</ul>
+
 <footer>
-  skinning_tools_qt ver 1.0.5 / created by gadget-design T.Kondo /
+  skinning_tools_qt ver 1.0.6 / created by gadget-design T.Kondo /
   <a href="https://www.gadget-design.com">www.gadget-design.com</a>
 </footer>
 

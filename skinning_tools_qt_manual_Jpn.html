@@ -159,7 +159,7 @@
 
 <header>
   <h1>skinning_tools_qt マニュアル</h1>
-  <p class="ver">ver 1.0.5 ／ Maya 2022 以降（PySide2 / PySide6 両対応）</p>
+  <p class="ver">ver 1.0.6 ／ Maya 2022 以降（PySide2 / PySide6 両対応）</p>
 </header>
 
 <nav class="toc" aria-label="目次">
@@ -176,6 +176,7 @@
     <li><a href="#copy">コピー / ペースト</a></li>
     <li><a href="#workflow">作業例</a></li>
     <li><a href="#notes">注意事項</a></li>
+    <li><a href="#history">バージョン履歴</a></li>
   </ol>
 </nav>
 
@@ -374,6 +375,7 @@ skinning_tools_qt.main()</code></pre>
 <h3>ヘルプ <span class="en">（Help）</span></h3>
 <p>
   <span class="ui">マニュアル (日本語)</span> <span class="en">（Manual (Japanese)）</span> / <span class="ui">マニュアル (英語)</span> <span class="en">（Manual (English)）</span>で、このマニュアルの日本語版 / 英語版をダイアログで表示します。<br>
+  <span class="ui">アップデート</span> <span class="en">（Update）</span>で、最新版の配布先（<a href="https://github.com/gadget-design/skinning_tools_qt">https://github.com/gadget-design/skinning_tools_qt</a>）をダイアログで表示します。URL をクリックすると、Web ブラウザでそのサイトが開き、ダイアログは閉じます。<br>
   <span class="ui">skinning_tools_qt について</span> <span class="en">（About skinning_tools_qt）</span>で、ツール名・バージョン・作者を表示します。
   作者名をクリックすると、Web ブラウザで作者のサイトが開きます。
 </p>
@@ -502,9 +504,9 @@ skinning_tools_qt.main()</code></pre>
 <div class="note">
   <p><strong>値を入れたときの正規化</strong></p>
   <p>
+    入力したセルには、入力した値がそのまま入ります。
     スキンクラスターのウェイトの正規化が ON のときは、頂点ごとに合計が 1.0 になるよう、
-    入力していないインフルエンスのウェイトを元の比率のまま増減させます。ロック中のインフルエンスの値は変わりません。
-    入力値がロック分を除いた残りより大きいときは、入力値のほうを縮めて収めます。
+    入力していないインフルエンスのウェイトを Maya の正規化で調整します（コンポーネントエディタで値を入れたときと同じです）。
   </p>
 </div>
 
@@ -595,8 +597,15 @@ skinning_tools_qt.main()</code></pre>
   <li><strong>複数のシェイプ：</strong>1 つのトランスフォームの下に複数のシェイプがあるオブジェクトでは、意図しない結果になることがあります（警告が出ます）。</li>
 </ul>
 
+<!-- ================================================================ -->
+<h2 id="history">12. バージョン履歴</h2>
+<ul>
+  <li><strong>v1.0.5</strong>：リリース</li>
+  <li><strong>v1.0.6</strong>：ウェイト表のセルに入力した値がそのまま入るように修正（残りは Maya の正規化で調整）。ヘルプに アップデート を追加、ボタンにツールチップを追加。</li>
+</ul>
+
 <footer>
-  skinning_tools_qt ver 1.0.5 ／ created by gadget-design T.Kondo ／
+  skinning_tools_qt ver 1.0.6 ／ created by gadget-design T.Kondo ／
   <a href="https://www.gadget-design.com">www.gadget-design.com</a>
 </footer>
 
